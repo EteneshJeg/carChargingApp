@@ -1,43 +1,25 @@
 import {
   ActivityIndicator,
+  AppState,
   Button,
   Image,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 
+import { CameraView } from "expo-camera";
 import ChargingOverview from "../components/ChargingOverview";
 import ChargingSessionCard from "../components/ChargingSessionCard";
 import EBirr from "../assets/EBirr.png";
 import axios from "axios";
+import { decode as base64Decode } from "base-64";
 import telebirr from "../assets/telebirr.png";
+import { useCameraPermissions } from "expo-camera";
 import { useMutation } from "@tanstack/react-query";
-
-// import Profile from "./profile";
-
-
-
-
-// For QR scanning in React Native you should use a library like:
-// react-native-camera or react-native-qrcode-scanner
-// html5-qrcode does NOT work in React Native
-
-// So you will need to install for example:
-// npm install react-native-qrcode-scanner react-native-permissions react-native-camera
-
-// Import your custom components for charging info cards and images accordingly
-// For example, replace web <img> with React Native <Image> components
-// And replace Toast notifications with React Native alternatives like react-native-toast-message or react-native-simple-toast
-
-// Here is a simplified version adjusted for React Native:
-
-
-
-
-
 
 let toastId = null;
 
@@ -51,20 +33,17 @@ const postStationInfo = async (payload) => {
 
 export default function QRScreen({ navigation }) {
   const pollingRef = useRef(null);
+  const qrLock = useRef(false);
+  const appState = useRef(AppState.currentState);
   const { mutateAsync } = useMutation(postStationInfo);
+  const [permission, requestPermission] = useCameraPermissions();
 
   const [chargingStationInfo, setChargingStationInfo] = useState(null);
   const [chargingStatus, setChargingStatus] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
   const [station, setStation] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
 
-  // NOTE: React Native does not support Html5Qrcode
-  // You need to use a React Native QR scanner like react-native-qrcode-scanner
-  // Below functions are placeholders to show logic flow
-  
-  // Simulated scan result handler (replace with actual scanner callback)
   const handleScanResult = async (scannedText) => {
     const decoded = decodeBase64Token(scannedText);
     if (decoded) {
@@ -116,24 +95,35 @@ export default function QRScreen({ navigation }) {
     };
   }, []);
 
-  // Placeholder startScan: integrate with react-native-qrcode-scanner
-  const startScan = () => {
-    // You would open the QR scanner here and set up a callback to handleScanResult
-    setIsScanning(true);
-    // e.g. display scanner modal or screen
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === "active"
+      ) {
+        qrLock.current = false;
+      }
+      appState.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
+  const startScan = async () => {
+    const granted = permission?.granted || (await requestPermission()).granted;
+    if (granted) {
+      setIsScanning(true);
+    } else {
+      showUniqueError("Camera permission denied");
+    }
   };
 
   const stopScan = () => {
-    // Stop scanner and clean up
     setIsScanning(false);
   };
 
-  // const paymentHandler = () => {
-  //   // navigation.navigate("Profile");
-  // };
-
-  // Toast equivalent in React Native: You can use react-native-toast-message or react-native-simple-toast
-  // For demo, simple alert is used here:
   const showUniqueError = (message) => {
     if (!toastId) {
       toastId = true;
@@ -146,11 +136,8 @@ export default function QRScreen({ navigation }) {
 
   const decodeBase64Token = (token) => {
     try {
-      // React Native does not have atob by default, install 'base-64' package
-      // npm install base-64
-      const base64 = require("base-64");
-      return base64.decode(token);
-    } catch (err) {
+      return base64Decode(token);
+    } catch {
       return null;
     }
   };
@@ -165,18 +152,30 @@ export default function QRScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {!station && (
-          <View style={styles.scannerPlaceholder}>
-            <View style={styles.scanButton}>
-              <Button title="Start Scanning" onPress={startScan} color="#007AFF" />
-            </View>
+      {!station && !isScanning && (
+        <View style={styles.scannerPlaceholder}>
+          <View style={styles.scanButton}>
+            <Button title="Start Scanning" onPress={startScan} color="#007AFF" />
           </View>
+        </View>
+      )}
+
+      {isScanning && (
+        <CameraView
+          style={StyleSheet.absoluteFillObject}
+          facing="back"
+          onBarcodeScanned={({ data }) => {
+            if (data && !qrLock.current) {
+              qrLock.current = true;
+              handleScanResult(data);
+            }
+          }}
+        />
       )}
 
       {station && chargingStatus === "completed" && chargingStationInfo?.data?.length > 0 && (
         <View>
           <ChargingSessionCard session={chargingStationInfo.data[0]} />
-
           <View style={styles.paymentButtonsContainer}>
             <TouchableOpacity style={styles.paymentButton}>
               <Image source={telebirr} style={styles.paymentIcon} />
@@ -201,6 +200,7 @@ export default function QRScreen({ navigation }) {
       {isScanning && (
         <Button title="Stop Scanning" onPress={stopScan} color="#1e40af" />
       )}
+
       {!isScanning && (
         <Button
           title={station ? "Start Scanning Again" : "Start Scanning"}
@@ -208,8 +208,6 @@ export default function QRScreen({ navigation }) {
           color="#1e40af"
         />
       )}
-
-      {/* <Button title="Go to Profile" onPress={paymentHandler} /> */}
     </View>
   );
 }
@@ -223,17 +221,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
     alignItems: "center",
-    paddingTop: '45%',
+    paddingTop: "45%",
   },
   scanButton: {
-    width: '95%',
+    width: "95%",
     borderRadius: 30,
-    overflow: 'hidden',
-  },
-  infoText: {
-    marginBottom: 16,
-    fontSize: 18,
-    color: "#1e40af",
+    overflow: "hidden",
   },
   paymentButtonsContainer: {
     marginTop: 20,

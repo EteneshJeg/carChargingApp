@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     height: 420,
     width: "100%",
     borderRadius: 20,
-    overflow: "hidden", // for rounded corners on map
+    overflow: "hidden",
   },
   map: {
     flex: 1,

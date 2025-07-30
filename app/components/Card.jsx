@@ -2,17 +2,6 @@ import { StyleSheet, Text, View } from "react-native";
 
 import React from "react";
 
-/**
- * Card component and subcomponents:
- * - Card: container with background, border, shadow, padding
- * - CardHeader: padding and margin bottom
- * - CardTitle: large, bold text
- * - CardDescription: small, gray text
- * - CardContent: horizontal padding
- * - CardFooter: row layout, top border, padding
- * - CardAction: aligned to end with right padding
- */
-
 export function Card(props) {
   return <View style={[styles.card, props.style]} {...props} />;
 }
@@ -52,12 +41,12 @@ export function CardAction(props) {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#fff",
-    color: "#000", // Text color doesn't apply here, put on Text components
+    color: "#000", 
     flexDirection: "column",
-    gap: 24, // React Native doesn't support gap, use marginBottom on children if needed
+    gap: 24, 
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#e5e7eb", // gray-200
+    borderColor: "#e5e7eb", 
     paddingVertical: 24,
     shadowColor: "#000",
     shadowOpacity: 0.05,
@@ -76,7 +65,7 @@ const styles = StyleSheet.create({
   },
   cardDescription: {
     fontSize: 14,
-    color: "#6b7280", // gray-500
+    color: "#6b7280", 
   },
   cardContent: {
     paddingHorizontal: 24,
@@ -87,7 +76,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 24,
     borderTopWidth: 1,
-    borderTopColor: "#e5e7eb", // gray-200
+    borderTopColor: "#e5e7eb", 
   },
   cardAction: {
     alignSelf: "flex-end",

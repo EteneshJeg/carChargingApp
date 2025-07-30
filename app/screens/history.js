@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   dateText: {
     marginLeft: 4,
     fontSize: 14,
-    color: "#2563eb", // blue-600
+    color: "#2563eb", 
     fontWeight: "500",
   },
   rowRight: {
@@ -193,10 +193,10 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   statusCompleted: {
-    color: "#16a34a", // green-600
+    color: "#16a34a", 
   },
   statusFailed: {
-    color: "#dc2626", // red-600
+    color: "#dc2626", 
   },
   stationRow: {
     flexDirection: "row",
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
   expandedDetails: {
     marginTop: 12,
     borderTopWidth: 1,
-    borderTopColor: "#bfdbfe", // blue-200
+    borderTopColor: "#bfdbfe", 
     paddingTop: 12,
   },
   detailText: {

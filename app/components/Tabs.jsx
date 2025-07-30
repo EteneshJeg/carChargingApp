@@ -26,7 +26,6 @@ function TabTrigger({ label, index, activeIndex, onPress }) {
 export function Tabs({ children, initialIndex = 0 }) {
   const [activeIndex, setActiveIndex] = useState(initialIndex);
 
-  // Extract labels from children - assumes children have "label" prop
   const labels =
     React.Children.map(children, (child) => child.props.label) || [];
 

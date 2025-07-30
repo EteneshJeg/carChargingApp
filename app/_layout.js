@@ -19,7 +19,6 @@ export default function Layout({children}) {
           {children}
         </View>
 
-        {/* Bottom Navigation */}
         <BottomNav />
       </SafeAreaView>
       <Toast />
@@ -29,7 +28,7 @@ export default function Layout({children}) {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: '#1e40af', // Tailwind's blue-900
+    backgroundColor: '#1e40af', 
     paddingVertical: 20,
     paddingHorizontal: 25,
     alignItems: 'center',

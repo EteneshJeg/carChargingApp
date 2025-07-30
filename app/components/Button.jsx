@@ -45,7 +45,6 @@ const styles = StyleSheet.create({
   },
 });
 
-// Variant styles for button container
 const stylesByVariant = {
   default: { backgroundColor: "#1E90FF", padding: 12 },
   destructive: { backgroundColor: "#e3342f", padding: 12 },
@@ -55,7 +54,6 @@ const stylesByVariant = {
   link: { backgroundColor: "transparent", padding: 0 },
 };
 
-// Text color styles per variant
 const textByVariant = {
   default: { color: "white" },
   destructive: { color: "white" },
@@ -65,7 +63,6 @@ const textByVariant = {
   link: { color: "#1E90FF", textDecorationLine: "underline" },
 };
 
-// Size styles for button container
 const stylesBySize = {
   default: {},
   sm: { paddingVertical: 6, paddingHorizontal: 12 },
