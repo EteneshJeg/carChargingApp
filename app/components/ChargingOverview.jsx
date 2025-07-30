@@ -3,7 +3,6 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { format } from "date-fns";
 
-// Badge component
 function Badge({ children, color = "#e0e0e0", textColor = "#000" }) {
   return (
     <View style={[styles.badge, { backgroundColor: color }]}>
@@ -69,7 +68,6 @@ export default function ChargingOverview({ session, stats }) {
   );
 }
 
-// Styles
 const styles = StyleSheet.create({
   card: {
     margin: 16,

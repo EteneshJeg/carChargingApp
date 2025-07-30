@@ -2,22 +2,6 @@ import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 import React from "react";
 
-/**
- * Button component supporting:
- * - variants: default, destructive, outline, secondary, ghost, link
- * - sizes: default, sm, lg, icon
- * - disabled state
- * - custom styles for container and text
- *
- * Props:
- * - title: string (button label)
- * - onPress: function
- * - disabled: boolean
- * - variant: one of variants (default: 'default')
- * - size: one of sizes (default: 'default')
- * - style: custom container style
- * - textStyle: custom text style
- */
 export const Button = ({
   title,
   onPress,

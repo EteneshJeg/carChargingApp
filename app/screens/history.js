@@ -142,12 +142,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     backgroundColor: "#f9fafb",
     alignItems: "center",
+    marginBottom: 20,
   },
   title: {
     fontSize: 32,
     fontWeight: "800",
     marginBottom: 24,
-    color: "#1e40af", // blue-900
+    color: "#1e40af",
+    marginTop:100,
+
   },
   card: {
     backgroundColor: "white",

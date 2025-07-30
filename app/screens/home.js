@@ -13,9 +13,7 @@ import React from 'react';
 function Home({ navigation }) {
 
   const handleClick = () => {
-    // router.push("/qr");
-    // Or you can navigate like this:
-    // navigation.navigate('SomeScreen');
+
   };
 
   return (
@@ -42,9 +40,8 @@ function Home({ navigation }) {
           onPress={handleClick}
           activeOpacity={0.8}
         >
-          <Text style={styles.ctaButtonText}>Get Started</Text>
+          <Text style={styles.ctaButtonText} onPress={() => navigation.navigate('QR')}>Get Started</Text>
         </TouchableOpacity>
-        {/* <Button title="Go to Profile" onPress={() => navigation.navigate('Profile')} /> */}
 
       </ImageBackground>
     </View>
@@ -90,16 +87,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 1 },
-    elevation: 5,
+    elevation: 6,
   },
   headlineText: {
-    fontSize: 32,
+    fontSize: 30,
     fontWeight: '800',
-    color: '#1e40af',
+    color: '#fff',
     textAlign: 'center',
-    textShadowColor: 'rgba(0,0,0,0.3)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
+    textShadowColor: 'rgba(0,0,0,0.35)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 6,
   },
   ctaButton: {
     backgroundColor: '#1e40af',

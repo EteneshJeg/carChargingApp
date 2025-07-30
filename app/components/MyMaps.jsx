@@ -46,7 +46,7 @@ export default function MyMaps() {
 
 const styles = StyleSheet.create({
   container: {
-    height: 400,
+    height: 420,
     width: "100%",
     borderRadius: 20,
     overflow: "hidden", // for rounded corners on map

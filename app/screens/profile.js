@@ -25,7 +25,7 @@ export default function Profile() {
 
   const handleContinue = () => {
     setLoadingPayment(!loading);
-    // Your signup logic here
+    // signup logic here
   };
 
   const renderCharge = ({ item }) => (
@@ -86,7 +86,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#1e3a8a',
     borderRadius: 50,
     padding: 16,
-    marginBottom: 24,
+    marginBottom: 30,
+    marginTop:40,
   },
   card: {
     width: '100%',

@@ -24,7 +24,7 @@ export default function BottomNav() {
           <TouchableOpacity
             key={path}
             onPress={() => {
-              console.log("Navigating to:", path); // 👈 log the path
+              console.log("Navigating to:", path);
               navigation.navigate(path);
             }}
             style={[
@@ -48,7 +48,6 @@ export default function BottomNav() {
   );
 }
 
-// 🎨 Styles
 const styles = StyleSheet.create({
   footer: {
     flexDirection: "row",
@@ -70,7 +69,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   activeTab: {
-    backgroundColor: "#1E3A8A", // Tailwind's blue-900
+    backgroundColor: "#1E3A8A",
     paddingVertical: 6,
     borderRadius: 6,
   },

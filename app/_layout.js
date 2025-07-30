@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
 import BottomNav from './components/BottomNav';
 import React from 'react';
@@ -9,20 +9,19 @@ import Toast from 'react-native-toast-message';
 export default function Layout({children}) {
   return (
     <SafeAreaProvider>
-      <View style={{ flex: 1 }}>
-        {/* Header */}
+      <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
           <Text style={styles.title}>TechHive</Text>
         </View>
 
         {/* Main content area */}
-        <View style={{ marginTop: 60, flex: 1 }}>
+        <View style={{flex: 1 }}>
           {children}
         </View>
 
         {/* Bottom Navigation */}
         <BottomNav />
-      </View>
+      </SafeAreaView>
       <Toast />
     </SafeAreaProvider>
   );
@@ -31,14 +30,14 @@ export default function Layout({children}) {
 const styles = StyleSheet.create({
   header: {
     backgroundColor: '#1e40af', // Tailwind's blue-900
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: 20,
+    paddingHorizontal: 25,
     alignItems: 'center',
     justifyContent: 'center',
     borderBottomWidth: 1,
     borderColor: '#ccc',
     position: 'absolute',
-    top: 0,
+    top: 1,
     left: 0,
     right: 0,
     zIndex: 999,
