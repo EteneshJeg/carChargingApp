@@ -11,25 +11,19 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app needs camera access to scan QR codes."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": ["CAMERA"]
     },
     "web": {},
-    "plugins": [
-      "expo-router",
-      [
-        "expo-camera",
-        {
-          "cameraPermission": "Allow ${PRODUCT_NAME} to access your camera",
-          "microphonePermission": "Allow ${PRODUCT_NAME}  to access your microphone",
-          "recordAudioAndroid": true
-        }
-      ]
-    ]
+    "plugins": ["expo-camera"]
   }
 }

@@ -3,15 +3,20 @@ import {
   FlatList,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import {
   Clock,
   CreditCard,
+  LogOut,
   Power,
   User,
 } from 'lucide-react-native';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+
+import { AuthContext } from '../context/AuthContext';
+import { useNavigation } from '@react-navigation/native';
 
 const recentCharges = [
   { id: 1, date: '2025-06-25', amount: 12.5, station: 'Station A' },
@@ -20,13 +25,18 @@ const recentCharges = [
 ];
 
 export default function Profile() {
-  const [phone, setPhone] = useState('');
   const [loading, setLoadingPayment] = useState(false);
+  const { user } = useContext(AuthContext);
 
   const handleContinue = () => {
     setLoadingPayment(!loading);
-    // signup logic here
   };
+
+const navigation = useNavigation();
+const handleLogout = () => {
+  navigation.replace('Login'); 
+};
+
 
   const renderCharge = ({ item }) => (
     <View style={styles.chargeItem}>
@@ -50,9 +60,9 @@ export default function Profile() {
 
       {/* Client Info */}
       <View style={styles.card}>
-        <Text style={styles.name}>John Doe</Text>
+        <Text style={styles.name}>{user?.username || 'Guest'}</Text>
         <Text style={styles.info}>
-          <CreditCard size={18} color="#1e40af" /> Account: 0922112211
+          <CreditCard size={18} color="#1e40af" /> Account: {user?.phone || 'N/A'}
         </Text>
         <Text style={styles.info}>
           <Power size={18} color="#1e40af" /> Status: Active
@@ -68,6 +78,11 @@ export default function Profile() {
           renderItem={renderCharge}
         />
       </View>
+      {/* Logout Button */}
+      <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
+        <LogOut size={18} color="white" />
+        <Text style={styles.logoutText}>Logout</Text>
+      </TouchableOpacity>
 
       {loading && <ActivityIndicator size="large" color="#1e40af" />}
     </View>
@@ -87,7 +102,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     padding: 16,
     marginBottom: 30,
-    marginTop:40,
+    marginTop: 40,
   },
   card: {
     width: '100%',
@@ -138,5 +153,20 @@ const styles = StyleSheet.create({
   chargeAmount: {
     fontWeight: 'bold',
     color: '#1e40af',
+  },
+   logoutBtn: {
+    flexDirection: 'row',
+    backgroundColor: '#ef4444',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 10,
+  },
+  logoutText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

@@ -20,27 +20,31 @@ export default function BottomNav() {
     <View style={styles.footer}>
       {tabs.map(({ label, icon: Icon, path }) => {
         const isActive = currentPath === path;
+        const activeColor = "#000080"; // navy blue
+        const inactiveColor = "#1E3A8A";
+
         return (
           <TouchableOpacity
             key={path}
-            onPress={() => {
-              console.log("Navigating to:", path);
-              navigation.navigate(path);
-            }}
-            style={[
-              styles.tab,
-              isActive ? styles.activeTab : styles.inactiveTab,
-            ]}
+            onPress={() => navigation.navigate(path)}
+            style={styles.tab}
           >
-            <Icon size={20} color={isActive ? "#E0F2FE" : "#1E3A8A"} />
-            <Text
+            <View
               style={[
-                styles.tabLabel,
-                { color: isActive ? "#E0F2FE" : "#1E3A8A" },
+                styles.tabWrapper,
+                isActive ? styles.activeTab : styles.inactiveTab,
               ]}
             >
-              {label}
-            </Text>
+              <Icon size={20} color={isActive ? activeColor : inactiveColor} />
+              <Text
+                style={[
+                  styles.tabLabel,
+                  { color: isActive ? activeColor : inactiveColor },
+                ]}
+              >
+                {label}
+              </Text>
+            </View>
           </TouchableOpacity>
         );
       })}
@@ -56,7 +60,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#ddd",
     paddingVertical: 8,
-    paddingBottom: 16,
+    paddingBottom: 10,
     position: "absolute",
     bottom: 0,
     left: 0,
@@ -68,15 +72,17 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
-  activeTab: {
-    backgroundColor: "#1E3A8A",
+  tabWrapper: {
+    alignItems: "center",
     paddingVertical: 6,
-    borderRadius: 6,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+  },
+  activeTab: {
+    backgroundColor: "#D9D9D9",
   },
   inactiveTab: {
     backgroundColor: "#fff",
-    paddingVertical: 6,
-    borderRadius: 6,
   },
   tabLabel: {
     fontSize: 12,

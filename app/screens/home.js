@@ -13,7 +13,7 @@ import React from 'react';
 function Home({ navigation }) {
 
   const handleClick = () => {
-
+      navigation.navigate('Register');
   };
 
   return (
@@ -40,7 +40,7 @@ function Home({ navigation }) {
           onPress={handleClick}
           activeOpacity={0.8}
         >
-          <Text style={styles.ctaButtonText} onPress={() => navigation.navigate('QR')}>Get Started</Text>
+          <Text style={styles.ctaButtonText}>Get Started</Text>
         </TouchableOpacity>
 
       </ImageBackground>
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 6,
   },
   ctaButton: {
-    backgroundColor: '#1e40af',
+    backgroundColor: '#1C398E',
     paddingVertical: 14,
     paddingHorizontal: 40,
     borderRadius: 50,

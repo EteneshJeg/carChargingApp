@@ -28,7 +28,7 @@ export default function Layout({children}) {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: '#1e40af', 
+    backgroundColor: '#1C398E', 
     paddingVertical: 20,
     paddingHorizontal: 25,
     alignItems: 'center',
