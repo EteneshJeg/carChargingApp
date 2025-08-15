@@ -20,7 +20,7 @@ export default function BottomNav() {
     <View style={styles.footer}>
       {tabs.map(({ label, icon: Icon, path }) => {
         const isActive = currentPath === path;
-        const activeColor = "#000080"; // navy blue
+        const activeColor = "#000080";
         const inactiveColor = "#1E3A8A";
 
         return (
@@ -60,14 +60,15 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#ddd",
     paddingVertical: 8,
-    paddingBottom: 10,
     position: "absolute",
     bottom: 0,
-    left: 0,
-    right: 0,
     zIndex: 10,
     elevation: 5,
+    maxWidth: 430,
+    alignSelf: "center",
+    width: "100%",
   },
+
   tab: {
     flex: 1,
     alignItems: "center",

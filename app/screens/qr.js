@@ -1,312 +1,368 @@
 import {
   ActivityIndicator,
-  AppState,
-  Button,
+  Alert,
   Image,
-  Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import { CameraView, useCameraPermissions } from "expo-camera";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
-import { CameraView } from "expo-camera";
-import ChargingOverview from "../components/ChargingOverview";
+import ActiveChargingInfo from "../components/ActiveChargingInfo";
+import { AuthContext } from "../context/AuthContext";
+import { Buffer } from "buffer";
 import ChargingSessionCard from "../components/ChargingSessionCard";
-import EBirr from "../assets/EBirr.png";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
-import { decode as base64Decode } from "base-64";
-import telebirr from "../assets/telebirr.png";
-import { useCameraPermissions } from "expo-camera";
-import { useQr } from '../context/QrContext';
+import { useNavigation } from "@react-navigation/native";
 
-// import { useMutation } from "@tanstack/react-query";
+const BACKEND_API =
+  "https://e-mobility-api.techiveet.com/api/emobility/charging-station-info";
 
-
-let toastId = null;
-
-// Backend call is disabled for now
-// const postStationInfo = async (payload) => {
-//   console.log(payload)
-//   const { data } = await axios.post(
-//     `${WrapperAPI}api/emobility/charging-station-info`,
-//     payload
-//   );
-//   console.log(payload)
-//   return data;
-// };
-
-export default function QRScreen({ navigation }) {
-  const pollingRef = useRef(null);
-  const qrLock = useRef(false);
-  const appState = useRef(AppState.currentState);
-  // const { mutateAsync } = useMutation(postStationInfo);
+export default function QRScanner() {
   const [permission, requestPermission] = useCameraPermissions();
-
-  const [chargingStationInfo, setChargingStationInfo] = useState(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanned, setScanned] = useState(false);
+  const [station, setStation] = useState(null);
+  const [chargingInfo, setChargingInfo] = useState(null);
   const [chargingStatus, setChargingStatus] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [station, setStation] = useState(null);
-  const [isScanning, setIsScanning] = useState(false);
-  const { scannedData, setScannedData } = useQr();
+  const pollingRef = useRef(null);
+  const navigation = useNavigation();
+  const { user } = useContext(AuthContext);
 
-  // Store parsed decoded object for UI display
-  const [decodedData, setDecodedData] = useState(null);
-
-  const handleScanResult = async (scannedText) => {
-    setScannedData(scannedText); // save raw scanned string in context
-
-    const decoded = decodeBase64Token(scannedText);
-    console.log("Decoded:", decoded);
-
-    if (decoded) {
-      try {
-        const parsed = JSON.parse(decoded);
-        setStation(parsed);
-        setDecodedData(parsed);
-        stopScan();
-
-        // If you want to call backend later, uncomment this:
-        // await handleChargingStationInfo(parsed);
-      } catch (err) {
-        console.warn(err);
-        showUniqueError("Invalid QR: Charging Station not found");
-      }
-    } else {
-      showUniqueError("Invalid QR: Charging Station not found");
+  useEffect(() => {
+    if (!permission || !permission.granted) {
+      requestPermission();
     }
+    return () => {
+      if (pollingRef.current) clearTimeout(pollingRef.current);
+    };
+  }, []);
 
-    // Keep qrLock locked for 3 seconds to avoid repeated scans
-    setTimeout(() => {
-      qrLock.current = false;
-    }, 3000);
+  // Decode Base64
+  const decodeBase64Token = (token) => {
+    try {
+      return Buffer.from(token, "base64").toString("utf8");
+    } catch {
+      return null;
+    }
+  };
+
+  const showError = (msg) => {
+    Alert.alert("Error", msg);
   };
 
   const handleChargingStationInfo = async (data) => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      // const result = await mutateAsync(data);
+      const response = await axios.post(BACKEND_API, data);
+      const result = response.data;
 
-      // if (
-      //   result.status === "completed" &&
-      //   (Array.isArray(result.data) ? result.data.length === 0 : Object.keys(result.data || {}).length === 0)
-      // ) {
-      //   showUniqueError("No Current Charging Status or Session Found");
-      // }
+      if (
+        result.status === "completed" &&
+        (Array.isArray(result.data)
+          ? result.data.length === 0
+          : Object.keys(result.data || {}).length === 0)
+      ) {
+        Alert.alert("Info", "No Current Charging Status or Session Found");
+      }
 
-      // setChargingStationInfo(result);
-      // setChargingStatus(result.status);
-      // console.log(result)
+      setChargingInfo(result);
+      setChargingStatus(result.status);
 
-      // if (result.status === "active") {
-      //   if (pollingRef.current) clearTimeout(pollingRef.current);
-
-      //   pollingRef.current = setTimeout(() => {
-      //     handleChargingStationInfo(data);
-      //   }, 5000);
-      // }
-    } catch {
-      showUniqueError("Failed to fetch charging station info");
+      if (result.status === "active") {
+        if (pollingRef.current) clearTimeout(pollingRef.current);
+        pollingRef.current = setTimeout(() => {
+          handleChargingStationInfo(data);
+        }, 5000);
+      }
+    } catch (err) {
+      showError("Failed to fetch charging station info");
     } finally {
       setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    return () => {
-      if (pollingRef.current) clearTimeout(pollingRef.current);
-      qrLock.current = false;
-    };
-  }, []);
+  const handleQRCodeScanned = ({ data }) => {
+    if (scanned || !data) return;
+    setScanned(true);
 
-  useEffect(() => {
-    const subscription = AppState.addEventListener("change", (nextAppState) => {
-      if (
-        appState.current.match(/inactive|background/) &&
-        nextAppState === "active"
-      ) {
-        qrLock.current = false;
+    const decoded = decodeBase64Token(data);
+    if (decoded) {
+      try {
+        const parsed = JSON.parse(decoded);
+        setStation(parsed);
+        handleChargingStationInfo(parsed);
+        setIsScanning(false);
+      } catch {
+        showError("Invalid QR: Unable to parse");
       }
-      appState.current = nextAppState;
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, []);
-
-  const startScan = async () => {
-    const permissionResponse = permission ?? (await requestPermission());
-    if (permissionResponse.granted) {
-      setIsScanning(true);
-      qrLock.current = false; // unlock scanning when starting
-      setStation(null);
-      setDecodedData(null);
-      setScannedData(null);
     } else {
-      showUniqueError("Camera permission denied");
+      showError("Invalid QR: Charging Station not found");
     }
+
+    setTimeout(() => setScanned(false), 2000);
+  };
+
+  const startScan = () => {
+    setIsScanning(true);
+    setStation(null);
+    setChargingInfo(null);
+    setChargingStatus(null);
   };
 
   const stopScan = () => {
     setIsScanning(false);
   };
 
-  const showUniqueError = (message) => {
-    if (!toastId) {
-      toastId = true;
-      alert(message);
-      setTimeout(() => {
-        toastId = null;
-      }, 3000);
-    }
+  const handlePayWithTelebirr = () => {
+    if (user) navigation.replace("Home");
+    else navigation.replace("Login");
   };
-
-  const decodeBase64Token = (token) => {
-    try {
-      return base64Decode(token);
-    } catch {
-      return null;
-    }
-  };
-
-  if (isLoading && station == null) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#04233f" />
-      </View>
-    );
-  }
-
-  console.log("Raw Scanned:", scannedData);
 
   return (
-    <View style={styles.container}>
-      {/* Show raw scanned string */}
-      {scannedData && (
-        <View style={{ marginBottom: 20 }}>
-          <Text style={{ fontWeight: "bold" }}>Raw Scanned String:</Text>
-          <Text selectable>{scannedData}</Text>
-        </View>
-      )}
-
-      {/* Show decoded parsed JSON data */}
-      {decodedData && (
-        <View style={{ marginBottom: 20 }}>
-          <Text style={{ fontWeight: "bold" }}>Decoded Data:</Text>
-          <Text selectable>{JSON.stringify(decodedData, null, 2)}</Text>
-        </View>
-      )}
-
-      {!station && !isScanning && (
-        <View style={styles.scannerPlaceholder}>
-          <View style={styles.scanButton}>
-            <Button title="Start Scanning" onPress={startScan} color="#007AFF" />
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={styles.container}>
+        {isLoading && !station && (
+          <View style={styles.loaderContainer}>
+            <ActivityIndicator size="large" color="#04233f" />
           </View>
-        </View>
-      )}
+        )}
 
-      {isScanning && (
-        <View
-          style={{
-            ...StyleSheet.absoluteFillObject,
-            zIndex: 100,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
+        {isScanning && !station && (
+          <>
+            <CameraView
+              style={StyleSheet.absoluteFill}
+              onBarcodeScanned={handleQRCodeScanned}
+              barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+            />
+
+            {/* Scanner Overlay */}
+            <View style={styles.overlay}>
+              <View style={styles.topOverlay} />
+              <View style={styles.middleRow}>
+                <View style={styles.sideOverlay} />
+
+                <View style={styles.scannerFrame}>
+                  <View style={[styles.corner, styles.topLeft]} />
+                  <View style={[styles.corner, styles.topRight]} />
+                  <View style={[styles.corner, styles.bottomLeft]} />
+                  <View style={[styles.corner, styles.bottomRight]} />
+                </View>
+
+                <View style={styles.sideOverlay} />
+              </View>
+              <View style={styles.bottomOverlay} />
+            </View>
+          </>
+        )}
+
+        {/* Completed Session */}
+        {!isScanning &&
+          station &&
+          chargingStatus === "completed" &&
+          chargingInfo?.data?.length > 0 && (
+            <>
+              <ChargingSessionCard
+                session={chargingInfo.data[0]}
+                style={styles.chargingInfoCard}
+              />
+
+              <View style={styles.paymentButtons}>
+                <TouchableOpacity
+                  style={styles.payButton}
+                  onPress={handlePayWithTelebirr}
+                >
+                  <Image
+                    source={require("../assets/telebirr.png")}
+                    style={styles.icon}
+                  />
+                  <Text style={styles.payText}>Pay with Telebirr</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.payButton}>
+                  <Image
+                    source={require("../assets/EBirr.png")}
+                    style={styles.icon}
+                  />
+                  <Text style={styles.payText}>Pay with E-Birr</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
+
+        {/* Active Session */}
+        {!isScanning &&
+          station &&
+          chargingStatus === "active" &&
+          chargingInfo?.data?.result?.[0] && (
+            <ActiveChargingInfo
+              session={chargingInfo.data.result[0]}
+              stats={chargingInfo.data.stats}
+            />
+          )}
+
+        <TouchableOpacity
+          style={styles.scanButton}
+          onPress={isScanning ? stopScan : startScan}
         >
-          <CameraView
-            style={StyleSheet.absoluteFillObject}
-            facing="back"
-            onBarcodeScanned={({ data }) => {
-              if (data && !qrLock.current) {
-                qrLock.current = true;
-                handleScanResult(data);
-              }
-            }}
-          />
-        </View>
-      )}
-
-      {station && chargingStatus === "completed" && chargingStationInfo?.data?.length > 0 && (
-        <View>
-          <ChargingSessionCard session={chargingStationInfo.data[0]} />
-          <View style={styles.paymentButtonsContainer}>
-            <TouchableOpacity style={styles.paymentButton}>
-              <Image source={telebirr} style={styles.paymentIcon} />
-              <Text style={styles.paymentText}>Pay with Telebirr</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.paymentButton}>
-              <Image source={EBirr} style={styles.paymentIcon} />
-              <Text style={styles.paymentText}>Pay with E-Birr</Text>
-            </TouchableOpacity>
+          <View style={styles.scanButtonContent}>
+            {isScanning && (
+              <Icon
+                name="autorenew"
+                size={20}
+                color="#fff"
+                style={{ marginRight: 8 }}
+              />
+            )}
+            <Text style={styles.buttonText}>
+              {isScanning ? "Stop Scanning" : "Start Scanning"}
+            </Text>
           </View>
-        </View>
-      )}
-
-      {station && chargingStatus === "active" && (
-        <ChargingOverview
-          session={chargingStationInfo?.data?.result?.[0]}
-          stats={chargingStationInfo?.data?.stats}
-        />
-      )}
-
-      {isScanning && (
-        <Button title="Stop Scanning" onPress={stopScan} color="#1e40af" />
-      )}
-
-      {!isScanning && (
-        <Button
-          title={station ? "Start Scanning Again" : "Start Scanning"}
-          onPress={startScan}
-          color="#1e40af"
-        />
-      )}
-    </View>
+        </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-  },
-  scannerPlaceholder: {
-    flex: 1,
-    justifyContent: "flex-start",
+    backgroundColor: "#fff",
+    justifyContent: "flex-end",
+    paddingBottom: 50,
+    paddingHorizontal: 20,
     alignItems: "center",
-    paddingTop: "45%",
+    maxWidth: 420,
+    width: "100%",
+    alignSelf: "center",
+    paddingTop: 70,
   },
-  scanButton: {
-    width: "95%",
-    borderRadius: 30,
-    overflow: "hidden",
+  chargingInfoCard: {
+    marginTop: 40,
   },
-  paymentButtonsContainer: {
-    marginTop: 20,
-  },
-  paymentButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#193CB8",
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 5,
-  },
-  paymentIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 8,
-  },
-  paymentText: {
-    color: "white",
-    fontWeight: "600",
-  },
-  loadingContainer: {
-    flex: 1,
+  loaderContainer: {
+    ...StyleSheet.absoluteFillObject,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#fff",
+  },
+  scanButton: {
+    backgroundColor: "#1E40AF",
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    width: "100%",
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 150,
+  },
+  scanButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "600",
+    textAlign: "center",
+  },
+
+  paymentButtons: {
+    marginTop: 15,
+    alignItems: "center",
+  },
+  payButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#1e40af",
+    padding: 10,
+    marginVertical: 5,
+    borderRadius: 6,
+  },
+  icon: {
+    width: 24,
+    height: 24,
+    marginRight: 10,
+  },
+  payText: {
+    color: "#fff",
+    fontWeight: "500",
+  },
+
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  topOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "30%",
+    backgroundColor: "rgba(0,0,0,0.6)",
+  },
+  bottomOverlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: "30%",
+    backgroundColor: "rgba(0,0,0,0.6)",
+  },
+  middleRow: {
+    flexDirection: "row",
+    width: "100%",
+    height: "40%",
+  },
+  sideOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+  },
+  scannerFrame: {
+    width: 250,
+    height: 250,
+    position: "relative",
+    backgroundColor: "transparent",
+  },
+  corner: {
+    position: "absolute",
+    width: 20,
+    height: 20,
+    borderColor: "#777c77ff",
+    borderWidth: 3,
+  },
+  topLeft: {
+    top: 0,
+    left: 0,
+    borderBottomWidth: 0,
+    borderRightWidth: 0,
+    borderTopLeftRadius: 8,
+  },
+  topRight: {
+    top: 0,
+    right: 0,
+    borderBottomWidth: 0,
+    borderLeftWidth: 0,
+    borderTopRightRadius: 8,
+  },
+  bottomLeft: {
+    bottom: 0,
+    left: 0,
+    borderTopWidth: 0,
+    borderRightWidth: 0,
+    borderBottomLeftRadius: 8,
+  },
+  bottomRight: {
+    bottom: 0,
+    right: 0,
+    borderTopWidth: 0,
+    borderLeftWidth: 0,
+    borderBottomRightRadius: 8,
   },
 });

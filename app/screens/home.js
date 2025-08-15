@@ -5,22 +5,21 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native';
+} from "react-native";
 
-import MyMaps from '../components/MyMaps';
-import React from 'react';
+import MyMaps from "../components/MyMaps";
+import React from "react";
 
 function Home({ navigation }) {
-
   const handleClick = () => {
-      navigation.navigate('Register');
+    navigation.navigate("QR");
   };
 
   return (
     <View style={styles.container}>
       <ImageBackground
         source={{
-          uri: 'https://cdn.mos.cms.futurecdn.net/SGHTwDLfSRtxSUBy3kibD.jpg',
+          uri: "https://cdn.mos.cms.futurecdn.net/SGHTwDLfSRtxSUBy3kibD.jpg",
         }}
         resizeMode="cover"
         style={styles.backgroundImage}
@@ -42,7 +41,6 @@ function Home({ navigation }) {
         >
           <Text style={styles.ctaButtonText}>Get Started</Text>
         </TouchableOpacity>
-
       </ImageBackground>
     </View>
   );
@@ -56,19 +54,19 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   mapWrapper: {
-    width: '80%',
+    width: "80%",
     maxWidth: 400,
     borderWidth: 2,
-    borderColor: '#1e40af',
+    borderColor: "#1e40af",
     borderRadius: 20,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    overflow: "hidden",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     marginBottom: 24,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.25,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
@@ -79,11 +77,11 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   headlineBackground: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.15,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 1 },
@@ -91,30 +89,30 @@ const styles = StyleSheet.create({
   },
   headlineText: {
     fontSize: 30,
-    fontWeight: '800',
-    color: '#fff',
-    textAlign: 'center',
-    textShadowColor: 'rgba(0,0,0,0.35)',
+    fontWeight: "800",
+    color: "#fff",
+    textAlign: "center",
+    textShadowColor: "rgba(0,0,0,0.35)",
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 6,
   },
   ctaButton: {
-    backgroundColor: '#1C398E',
+    backgroundColor: "#1C398E",
     paddingVertical: 14,
     paddingHorizontal: 40,
     borderRadius: 50,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.3,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
     elevation: 10,
     zIndex: 10,
-    marginTop: 16,
+    marginTop: 10,
   },
   ctaButtonText: {
-    color: 'white',
-    fontWeight: '600',
+    color: "white",
+    fontWeight: "600",
     fontSize: 18,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });

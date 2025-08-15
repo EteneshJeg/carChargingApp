@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from "react";
 
 // 1. Create the context
 const QrContext = createContext();
@@ -18,7 +18,7 @@ export const QrProvider = ({ children }) => {
 export const useQr = () => {
   const context = useContext(QrContext);
   if (!context) {
-    throw new Error('useQr must be used inside QrProvider');
+    throw new Error("useQr must be used inside QrProvider");
   }
   return context;
 };

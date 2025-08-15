@@ -6,39 +6,45 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from 'react-native';
-import React, { useContext, useState } from 'react';
+} from "react-native";
+import React, { useContext, useState } from "react";
 
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from "../context/AuthContext";
 
 export default function LoginScreen({ navigation }) {
   const { login } = useContext(AuthContext);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleLogin = async () => {
-    const success = await login(username, password);
-    if (!success) {
-      setError('Invalid credentials');
+    setError("");
+    if (!phoneNumber || !password) {
+      setError("Please fill all fields");
+      return;
+    }
+
+    const res = await login(phoneNumber, password);
+    if (res.success) {
+      navigation.replace("Home");
     } else {
-      navigation.replace('Home');
+      setError("Invalid credentials");
     }
   };
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={styles.container}
     >
       <Text style={styles.title}>Welcome Back</Text>
 
       <TextInput
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
+        placeholder="Phone Number"
+        value={phoneNumber}
+        onChangeText={setPhoneNumber}
         style={styles.input}
-        autoCapitalize="none"
+        keyboardType="phone-pad"
       />
       <TextInput
         placeholder="Password"
@@ -48,15 +54,15 @@ export default function LoginScreen({ navigation }) {
         style={styles.input}
       />
 
-      {error !== '' && <Text style={styles.error}>{error}</Text>}
+      {error !== "" && <Text style={styles.error}>{error}</Text>}
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Log In</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+      <TouchableOpacity onPress={() => navigation.navigate("Register")}>
         <Text style={styles.link}>
-          Don't have an account?{' '}
+          Don't have an account?
           <Text style={styles.linkBold}>Register</Text>
         </Text>
       </TouchableOpacity>
@@ -68,47 +74,47 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 24,
-    justifyContent: 'center',
-    backgroundColor: '#f9f9f9',
+    justifyContent: "center",
+    backgroundColor: "#f9f9f9",
   },
   title: {
     fontSize: 28,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
     marginBottom: 24,
-    color: '#333',
+    color: "#333",
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
-    backgroundColor: '#fff',
+    borderColor: "#ccc",
+    backgroundColor: "#fff",
     padding: 14,
     borderRadius: 10,
     marginBottom: 16,
   },
   button: {
-    backgroundColor: '#2e86de',
+    backgroundColor: "#2e86de",
     paddingVertical: 14,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 16,
   },
   buttonText: {
-    color: '#fff',
-    fontWeight: '600',
+    color: "#fff",
+    fontWeight: "600",
     fontSize: 16,
   },
   error: {
-    color: 'red',
+    color: "red",
     marginBottom: 12,
-    textAlign: 'center',
+    textAlign: "center",
   },
   link: {
-    textAlign: 'center',
-    color: '#2e86de',
+    textAlign: "center",
+    color: "#2e86de",
   },
   linkBold: {
-    fontWeight: '600',
-    color: '#2e86de',
+    fontWeight: "600",
+    color: "#2e86de",
   },
 });

@@ -1,4 +1,4 @@
-import MapView, { Callout, Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, { Callout, Marker, UrlTile } from "react-native-maps";
 import { StyleSheet, Text, View } from "react-native";
 
 import { MapPin } from "lucide-react-native";
@@ -22,13 +22,14 @@ export default function MyMaps() {
 
   return (
     <View style={styles.container}>
-      <MapView
-        style={styles.map}
-        provider={PROVIDER_GOOGLE}
-        initialRegion={initialRegion}
-        showsUserLocation={false}
-        showsMyLocationButton={false}
-      >
+      <MapView style={styles.map} initialRegion={initialRegion}>
+        {/* OpenStreetMap free tiles */}
+        <UrlTile
+          urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maximumZ={19}
+          flipY={false}
+        />
+
         {locations.map(({ lat, lng, label }, idx) => (
           <Marker key={idx} coordinate={{ latitude: lat, longitude: lng }}>
             <View>

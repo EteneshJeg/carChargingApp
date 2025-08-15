@@ -1,7 +1,9 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 
 import React from "react";
 import { format } from "date-fns";
+
+const screenWidth = Math.min(Dimensions.get("window").width, 400);
 
 export default function ChargingSessionCard({ session }) {
   if (!session) return null;
@@ -11,7 +13,6 @@ export default function ChargingSessionCard({ session }) {
     connectorId,
     timestamp,
     stateOfCharge,
-    stop,
     stop: {
       timestamp: stopTime,
       reason,
@@ -23,57 +24,69 @@ export default function ChargingSessionCard({ session }) {
   } = session;
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { width: screenWidth }]}>
+      {/* Badge top right */}
       <View style={styles.header}>
         <Text style={styles.title}>Charging Session</Text>
-        <Text style={styles.badge}>Completed</Text>
+        <View style={styles.statusBadge}>
+          <Text style={styles.badgeText}>Completed</Text>
+        </View>
       </View>
 
-      <View style={styles.row}>
+      {/* Info Rows */}
+      <View style={styles.infoRow}>
         <Text style={styles.label}>Station:</Text>
-        <Text>{chargeBoxID}</Text>
+        <Text style={styles.value}>{chargeBoxID}</Text>
       </View>
 
-      <View style={styles.row}>
+      <View style={styles.infoRow}>
         <Text style={styles.label}>Connector:</Text>
-        <Text style={styles.outlineBadge}>#{connectorId}</Text>
+        <Text style={styles.value}>#{connectorId}</Text>
       </View>
 
-      <View style={styles.row}>
+      <View style={styles.infoRow}>
         <Text style={styles.label}>Start Time:</Text>
-        <Text>{format(new Date(timestamp), "PPpp")}</Text>
+        <Text style={styles.value}>{format(new Date(timestamp), "PPpp")}</Text>
       </View>
 
-      <View style={styles.row}>
+      <View style={styles.infoRow}>
         <Text style={styles.label}>Stop Time:</Text>
-        <Text>{format(new Date(stopTime), "PPpp")}</Text>
+        <Text style={styles.value}>{format(new Date(stopTime), "PPpp")}</Text>
       </View>
 
-      <View style={styles.row}>
-        <Text style={styles.label}>Energy Consumed:</Text>
-        <Text>{(totalConsumptionWh / 1000).toFixed(2)} kWh</Text>
+      <View style={styles.infoRow}>
+        <Text style={styles.label}>Energy Used:</Text>
+        <Text style={styles.value}>
+          {(totalConsumptionWh / 1000).toFixed(2)} kWh
+        </Text>
       </View>
 
-      <View style={styles.row}>
+      <View style={styles.infoRow}>
         <Text style={styles.label}>Duration:</Text>
-        <Text>{Math.round(totalDurationSecs / 60)} mins</Text>
+        <Text style={styles.value}>
+          {Math.round(totalDurationSecs / 60)} mins
+        </Text>
       </View>
 
-      <View style={styles.row}>
-        <Text style={styles.label}>SOC (Start → Stop):</Text>
-        <Text>
+      <View style={styles.infoRow}>
+        <Text style={styles.label}>SOC:</Text>
+        <Text style={styles.value}>
           {stateOfCharge}% → {stopSOC}%
         </Text>
       </View>
 
-      <View style={styles.row}>
+      <View style={styles.infoRow}>
         <Text style={styles.label}>Stop Reason:</Text>
-        <Text style={styles.badge}>{reason}</Text>
+        <View style={styles.statusBadge}>
+          <Text style={styles.badgeText}>{reason}</Text>
+        </View>
       </View>
 
-      <View style={styles.row}>
+      <View style={styles.infoRow}>
         <Text style={styles.label}>Price:</Text>
-        <Text style={styles.badge}>{price} ETB</Text>
+        <View style={styles.statusBadge}>
+          <Text style={styles.badgeText}>{price} ETB</Text>
+        </View>
       </View>
     </View>
   );
@@ -81,50 +94,51 @@ export default function ChargingSessionCard({ session }) {
 
 const styles = StyleSheet.create({
   card: {
-    borderWidth: 1,
-    borderColor: "#cce4ff",
-    borderRadius: 8,
-    padding: 16,
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
+    padding: 25,
+    paddingRight: 40,
+    borderRadius: 12,
     marginVertical: 10,
+    marginTop: 40,
     shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 3,
+    shadowRadius: 3,
+    elevation: 5,
+    marginHorizontal: "auto",
   },
   header: {
-    marginBottom: 12,
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
   },
   title: {
-    fontWeight: "bold",
     fontSize: 18,
-    color: "#1e40af",
+    fontWeight: "600",
+    color: "#1e293b",
   },
-  badge: {
-    backgroundColor: "#ef4444",
-    color: "#fff",
-    paddingHorizontal: 8,
+  statusBadge: {
+    backgroundColor: "#dc2626",
     paddingVertical: 4,
-    borderRadius: 12,
-    overflow: "hidden",
+    paddingHorizontal: 10,
+    borderRadius: 20,
   },
-  outlineBadge: {
-    borderColor: "#ccc",
-    borderWidth: 1,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
+  badgeText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "500",
   },
-  row: {
+  infoRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 6,
+    marginBottom: 8,
   },
   label: {
-    fontWeight: "600",
-    color: "#4b5563",
+    fontWeight: "500",
+    color: "#475569",
+  },
+  value: {
+    color: "#1e293b",
   },
 });

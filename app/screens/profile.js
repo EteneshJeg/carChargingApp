@@ -5,38 +5,32 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native';
-import {
-  Clock,
-  CreditCard,
-  LogOut,
-  Power,
-  User,
-} from 'lucide-react-native';
-import React, { useContext, useState } from 'react';
+} from "react-native";
+import { Clock, CreditCard, LogOut, Power, User } from "lucide-react-native";
+import React, { useContext, useState } from "react";
 
-import { AuthContext } from '../context/AuthContext';
-import { useNavigation } from '@react-navigation/native';
+import { AuthContext } from "../context/AuthContext";
+import { useNavigation } from "@react-navigation/native";
 
 const recentCharges = [
-  { id: 1, date: '2025-06-25', amount: 12.5, station: 'Station A' },
-  { id: 2, date: '2025-06-20', amount: 8.0, station: 'Station B' },
-  { id: 3, date: '2025-06-15', amount: 15.75, station: 'Station C' },
+  { id: 1, date: "2025-06-25", amount: 12.5, station: "Station A" },
+  { id: 2, date: "2025-06-20", amount: 8.0, station: "Station B" },
+  { id: 3, date: "2025-06-15", amount: 15.75, station: "Station C" },
 ];
 
 export default function Profile() {
   const [loading, setLoadingPayment] = useState(false);
-  const { user } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
+  const navigation = useNavigation();
 
   const handleContinue = () => {
     setLoadingPayment(!loading);
   };
 
-const navigation = useNavigation();
-const handleLogout = () => {
-  navigation.replace('Login'); 
-};
-
+  const handleLogout = async () => {
+    await logout();
+    navigation.replace("Login");
+  };
 
   const renderCharge = ({ item }) => (
     <View style={styles.chargeItem}>
@@ -60,9 +54,10 @@ const handleLogout = () => {
 
       {/* Client Info */}
       <View style={styles.card}>
-        <Text style={styles.name}>{user?.username || 'Guest'}</Text>
+        <Text style={styles.name}>{user?.name || "Guest"}</Text>
         <Text style={styles.info}>
-          <CreditCard size={18} color="#1e40af" /> Account: {user?.phone || 'N/A'}
+          <CreditCard size={18} color="#1e40af" /> Account:{" "}
+          {user?.phone_number || "N/A"}
         </Text>
         <Text style={styles.info}>
           <Power size={18} color="#1e40af" /> Status: Active
@@ -93,21 +88,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    paddingTop: 80,
-    alignItems: 'center',
-    backgroundColor: '#f9fafb',
+    paddingTop: 50,
+    alignItems: "center",
+    backgroundColor: "#f9fafb",
   },
   avatar: {
-    backgroundColor: '#1e3a8a',
+    backgroundColor: "#1e3a8a",
     borderRadius: 50,
     padding: 16,
     marginBottom: 30,
     marginTop: 40,
   },
   card: {
-    width: '100%',
+    width: "100%",
     maxWidth: 400,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 12,
     padding: 16,
     marginBottom: 20,
@@ -115,58 +110,62 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
+    color: "#1e40af",
   },
   info: {
-    color: '#1e40af',
+    color: "#1e40af",
     fontSize: 14,
     marginBottom: 4,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 10,
+    color: "#1e40af",
   },
   chargeItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderBottomColor: '#dbeafe',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderBottomColor: "#dbeafe",
     borderBottomWidth: 1,
     paddingVertical: 10,
+    marginBottom: 5,
   },
   chargeStation: {
-    fontWeight: '500',
+    fontWeight: "500",
     fontSize: 15,
+    color: "#1e40af",
   },
   chargeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 2,
   },
   chargeDate: {
     marginLeft: 4,
     fontSize: 12,
-    color: '#1e40af',
+    color: "#1e40af",
   },
   chargeAmount: {
-    fontWeight: 'bold',
-    color: '#1e40af',
+    fontWeight: "bold",
+    color: "#1e40af",
   },
-   logoutBtn: {
-    flexDirection: 'row',
-    backgroundColor: '#ef4444',
+  logoutBtn: {
+    flexDirection: "row",
+    backgroundColor: "#ef4444",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     gap: 8,
     marginTop: 10,
   },
   logoutText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

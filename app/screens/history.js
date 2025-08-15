@@ -7,14 +7,15 @@ import {
   MapPin,
   XCircle,
 } from "lucide-react-native";
-import React, { useState } from "react";
 import {
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import React, { useState } from "react";
 
 const chargingHistory = [
   {
@@ -54,6 +55,7 @@ const chargingHistory = [
 
 export default function History() {
   const [expandedId, setExpandedId] = useState(null);
+  const [hoveredId, setHoveredId] = useState(null);
 
   const toggleExpand = (id) => {
     setExpandedId(expandedId === id ? null : id);
@@ -104,8 +106,13 @@ export default function History() {
               </Text>
             </View>
 
-            <TouchableOpacity
-              style={styles.detailsButton}
+            <Pressable
+              onHoverIn={() => setHoveredId(charge.id)}
+              onHoverOut={() => setHoveredId(null)}
+              style={[
+                styles.detailsButton,
+                hoveredId === charge.id && styles.detailsButtonHover,
+              ]}
               onPress={() => toggleExpand(charge.id)}
               activeOpacity={0.7}
             >
@@ -115,7 +122,7 @@ export default function History() {
               ) : (
                 <ChevronDown color="#1e40af" width={18} height={18} />
               )}
-            </TouchableOpacity>
+            </Pressable>
 
             {isExpanded && (
               <View style={styles.expandedDetails}>
@@ -149,8 +156,7 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     marginBottom: 24,
     color: "#1e40af",
-    marginTop:100,
-
+    marginTop: 100,
   },
   card: {
     backgroundColor: "white",
@@ -180,7 +186,7 @@ const styles = StyleSheet.create({
   dateText: {
     marginLeft: 4,
     fontSize: 14,
-    color: "#2563eb", 
+    color: "#2563eb",
     fontWeight: "500",
   },
   rowRight: {
@@ -193,10 +199,10 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   statusCompleted: {
-    color: "#16a34a", 
+    color: "#16a34a",
   },
   statusFailed: {
-    color: "#dc2626", 
+    color: "#dc2626",
   },
   stationRow: {
     flexDirection: "row",
@@ -207,6 +213,7 @@ const styles = StyleSheet.create({
   stationText: {
     fontWeight: "700",
     fontSize: 16,
+    color: "#2563eb",
   },
   amountRow: {
     flexDirection: "row",
@@ -217,7 +224,7 @@ const styles = StyleSheet.create({
   amountText: {
     fontWeight: "700",
     fontSize: 18,
-    color: "#1e40af", // blue-700
+    color: "#1e40af",
   },
   detailsButton: {
     flexDirection: "row",
@@ -226,7 +233,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginTop: 8,
     borderRadius: 12,
-    backgroundColor: "#bfdbfe", // blue-200
+    backgroundColor: "transparent",
+  },
+  detailsButtonHover: {
+    backgroundColor: "#BFDBFE",
   },
   detailsButtonText: {
     fontWeight: "700",
@@ -237,7 +247,7 @@ const styles = StyleSheet.create({
   expandedDetails: {
     marginTop: 12,
     borderTopWidth: 1,
-    borderTopColor: "#bfdbfe", 
+    borderTopColor: "#bfdbfe",
     paddingTop: 12,
   },
   detailText: {
