@@ -1,10 +1,12 @@
-import MapView, { Callout, Marker, UrlTile } from "react-native-maps";
-import { StyleSheet, Text, View } from "react-native";
+import * as Location from "expo-location";
 
-import { MapPin } from "lucide-react-native";
-import React from "react";
+import MapView, { Marker } from "react-native-maps";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, View } from "react-native";
 
 export default function MyMaps() {
+  const [region, setRegion] = useState(null);
+
   const locations = [
     {
       lat: 9.597564734508111,
@@ -13,32 +15,43 @@ export default function MyMaps() {
     },
   ];
 
-  const initialRegion = {
-    latitude: locations[0].lat,
-    longitude: locations[0].lng,
-    latitudeDelta: 0.01,
-    longitudeDelta: 0.01,
-  };
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Permission to access location was denied");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+    })();
+  }, []);
+
+  if (!region) {
+    return <View style={{ height: 420, backgroundColor: "#ccc" }} />;
+  }
 
   return (
     <View style={styles.container}>
-      <MapView style={styles.map} initialRegion={initialRegion}>
-        {/* OpenStreetMap free tiles */}
-        <UrlTile
-          urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-          maximumZ={19}
-          flipY={false}
-        />
-
-        {locations.map(({ lat, lng, label }, idx) => (
-          <Marker key={idx} coordinate={{ latitude: lat, longitude: lng }}>
-            <View>
-              <MapPin size={32} color="#2563eb" />
-            </View>
-            <Callout>
-              <Text>{label}</Text>
-            </Callout>
-          </Marker>
+      <MapView
+        style={styles.map}
+        initialRegion={region} // ✅ Use region object here
+      >
+        {locations.map((loc, index) => (
+          <Marker
+            key={index}
+            coordinate={{
+              latitude: loc.lat,
+              longitude: loc.lng,
+            }}
+            title={loc.label}
+          />
         ))}
       </MapView>
     </View>

@@ -13,17 +13,37 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSCameraUsageDescription": "This app needs camera access to scan QR codes."
-      }
+        "NSCameraUsageDescription": "This app needs camera access to scan QR codes.",
+        "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show your position on the map."
+      },
+      "config": {
+        "googleMapsApiKey": "AIzaSyDJiLw_ijuW3V9OaARcMEMhj9ummOpENbg"
+      },
+      "bundleIdentifier": "com.anonymous.DoneWithIt"
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "permissions": ["CAMERA"]
+      "permissions": [
+        "CAMERA",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDJiLw_ijuW3V9OaARcMEMhj9ummOpENbg"
+        }
+      },
+      "package": "com.anonymous.DoneWithIt"
     },
     "web": {},
-    "plugins": ["expo-camera"]
+    "plugins": [
+      "expo-camera",
+      "expo-barcode-scanner"
+    ]
   }
 }
